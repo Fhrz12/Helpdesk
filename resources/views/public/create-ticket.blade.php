@@ -32,11 +32,18 @@
                     {{-- Field Divisi --}}
                     <div class="form-group">
                         <label for="guest_divisi">Divisi</label>
-                        <input type="text" id="guest_divisi" name="guest_divisi" class="form-control @error('guest_divisi') is-invalid @enderror" value="{{ old('guest_divisi') }}" required>
+                        <select id="guest_divisi" name="guest_divisi" class="form-control @error('guest_divisi') is-invalid @enderror" required>
+                            <option value="">- Pilih Divisi -</option>
+                            @foreach ($divisions as $division)
+                                <option value="{{ $division }}" {{ old('guest_divisi') == $division ? 'selected' : '' }}>
+                                    {{ $division }}
+                                </option>
+                            @endforeach
+                        </select>
                         @error('guest_divisi')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
                         @enderror
                     </div>
 

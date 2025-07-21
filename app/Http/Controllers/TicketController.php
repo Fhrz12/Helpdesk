@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Ticket;
 use App\Mail\MailNotify;
 use App\Models\Customer;
+use App\Http\Requests\AssignTicketRequest;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,24 +33,25 @@ class TicketController extends Controller
      */
     public function index()
     {
-        // if(Auth::user()->hasRole('Teknisi'))
-        // {
-        //     $tickets = Ticket::where('assignee', Auth::id())->latest()->when(request()->q, function($tickets) {
-        //         $tickets = $tickets->where('problemsummary', 'like', '%'. request()->q . '%');
-        //     })->paginate(5);
-        // } else {
-        //     $tickets = Ticket::latest()->when(request()->q, function($tickets) {
-        //         $tickets = $tickets->where('problemsummary', 'like', '%'. request()->q . '%');
-        //     })->paginate(5);
-        // }
+        $user = Auth::user();
 
-        // Mengambil semua tiket terbaru, diurutkan dari yang paling baru
-        $tickets = Ticket::latest()->when(request()->q, function ($tickets) {
-            $tickets = $tickets->where('problemsummary', 'like', '%' . request()->q . '%');
-        })->paginate(10); // Anda bisa sesuaikan jumlah per halaman
-
-        return view('tickets.index', compact('tickets'));
-
+        // Cek jika pengguna memiliki peran 'Teknisi'
+        if ($user->hasRole('Teknisi')) {
+            // Jika Teknisi, hanya tampilkan tiket yang di-assign kepadanya
+            $tickets = Ticket::where('assignee', $user->id)
+                ->latest()
+                ->when(request()->q, function ($query) {
+                    $query->where('problemsummary', 'like', '%' . request()->q . '%');
+                })
+                ->paginate(10);
+        } else {
+            // Jika bukan Teknisi (misal: Admin), tampilkan semua tiket
+            $tickets = Ticket::latest()
+                ->when(request()->q, function ($query) {
+                    $query->where('problemsummary', 'like', '%' . request()->q . '%');
+                })
+                ->paginate(10);
+        }
 
         return view('tickets.index', compact('tickets'));
     }
@@ -59,6 +61,8 @@ class TicketController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+
     public function create()
     {
         $slas = Sla::orderBy('name', 'asc')->get();
@@ -72,6 +76,7 @@ class TicketController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -135,13 +140,16 @@ class TicketController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+
+    public function updateForm(Ticket $ticket)
     {
-        $ticket = Ticket::findOrFail($id);
-        $slas = Sla::orderBy('name', 'asc')->get();
-        $users = User::role('teknisi')->get();
-        $customer = new Customer;
-        return view('tickets.detail', compact('ticket', 'slas', 'users', 'customer'));
+        if (Auth::user()->hasRole('Teknisi')) {
+            // Teknisi melihat form untuk update resolusi dan status
+            return view('tickets.workspace', compact('ticket'));
+        }
+
+        // Admin melihat halaman detail dan tombol untuk assign
+        return view('tickets.update', compact('ticket'));
     }
 
     /**
@@ -151,40 +159,22 @@ class TicketController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        $this->validate($request, [
-            'updated_customer' => 'required',
-            'reporteddate' => 'required|date',
-            'sla_id' => 'required',
-            'summary' => 'required',
-            'detail' => 'required',
-            'technician_id' => 'required',
-        ]);
 
-        $ticket = Ticket::findOrFail($id);
+    public function update(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'status'     => 'required|in:In Progress,Closed',
+            'resolution' => 'required|string',
+        ]);
 
         $ticket->update([
-            'sla_id' => $request->input('sla_id'),
-            'customer_id' => $request->input('updated_customer'),
-            'reporteddate' => $request->input('reporteddate'),
-            'problemsummary' => $request->input('summary'),
-            'problemdetail' => $request->input('detail'),
-            'assignee' => $request->input('technician_id'),
-            'resolution' => $request->input('resolution'),
-            'status' => $request->input('status')
+            'status'     => $request->status,
+            'resolution' => $request->resolution,
         ]);
 
-        if ($ticket) {
-            //redirect dengan pesan sukses
-            $user = Auth::user();
-            $subject = 'Memperbaharui Tiket No ' . $ticket->number;
-            event(new ProvidersLogActivity($user, $subject));
-            return redirect()->route('tickets.index')->with(['success' => 'Tiket Berhasil Diupdate!']);
-        } else {
-            //redirect dengan pesan error
-            return redirect()->route('tickets.index')->with(['error' => 'Tiket Gagal Diupdate!']);
-        }
+        // Logika event atau notifikasi bisa ditambahkan di sini
+
+        return redirect()->route('tickets.index')->with('success', 'Tiket berhasil di-update!');
     }
 
     /**
@@ -225,17 +215,12 @@ class TicketController extends Controller
     /**
      * Menyimpan data penugasan tiket.
      */
-    public function assignStore(Request $request, Ticket $ticket)
+    public function assignStore(AssignTicketRequest $request, Ticket $ticket)
     {
-        $request->validate([
-            'assignee' => 'required|exists:users,id',
-            'sla_id'   => 'required|exists:slas,id',
-        ]);
-
         $ticket->update([
             'assignee'      => $request->assignee,
             'sla_id'        => $request->sla_id,
-            'status'        => 'Assigned', // Ganti status menjadi Assigned
+            'status'        => Ticket::STATUS_ASSIGNED,
             'assigneddate'  => now(),
         ]);
 

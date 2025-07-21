@@ -12,14 +12,28 @@
                     <h4>Formulir Penugasan Tiket No: {{ $ticket->number }}</h4>
                 </div>
                 <div class="card-body">
+
                     <form action="{{ route('tickets.assignStore', $ticket->id) }}" method="POST">
                         @csrf
+
+                        {{-- Menampilkan pesan error jika ada --}}
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <strong>Terjadi Kesalahan!</strong>
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <div class="form-group">
                             <label>URGENCY / SLA</label>
                             <select class="form-control @error('sla_id') is-invalid @enderror" name="sla_id" required>
                                 <option value="">- Pilih SLA -</option>
                                 @foreach ($slas as $sla)
-                                <option value="{{ $sla->id }}">{{ $sla->name }}</option>
+                                    <option value="{{ $sla->id }}">{{ $sla->name }}</option>
                                 @endforeach
                             </select>
                             @error('sla_id')
@@ -32,7 +46,7 @@
                             <select class="form-control @error('assignee') is-invalid @enderror" name="assignee" required>
                                 <option value="">- Pilih Teknisi -</option>
                                 @foreach ($technicians as $technician)
-                                <option value="{{ $technician->id }}">{{ $technician->name }}</option>
+                                    <option value="{{ $technician->id }}">{{ $technician->name }}</option>
                                 @endforeach
                             </select>
                             @error('assignee')

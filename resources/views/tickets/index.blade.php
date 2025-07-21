@@ -52,9 +52,9 @@
 
                                     <td>{{ $ticket->guest_divisi }}</td>
                                     <td>
-                                        @if($ticket->status == 'Open')
+                                        @if($ticket->status == \App\Models\Ticket::STATUS_OPEN)
                                         <span class="badge badge-primary">OPEN</span>
-                                        @elseif($ticket->status == 'Assigned')
+                                        @elseif($ticket->status == \App\Models\Ticket::STATUS_ASSIGNED)
                                         <span class="badge badge-info">ASSIGNED</span>
                                         @elseif($ticket->status == 'In Progress')
                                         <span class="badge badge-warning">IN PROGRESS</span>
@@ -63,15 +63,29 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        {{-- Tombol Edit ini sekarang berfungsi sebagai "Assign" --}}
-                                        <a href="{{ route('tickets.edit', $ticket->id) }}" class="btn btn-sm btn-primary">
-                                            <i class="fa fa-pencil-alt"></i> LIHAT/ASSIGN
-                                        </a>
+                                        @if(Auth::user()->hasRole('Teknisi'))
+                                            
+                                            {{-- Logika baru: Cek jika status BUKAN closed --}}
+                                            @if ($ticket->status != \App\Models\Ticket::STATUS_CLOSED)
+                                                <a href="{{ route('tickets.edit', $ticket->id) }}" class="btn btn-sm btn-info">
+                                                    <i class="fa fa-pencil-alt"></i> UPDATE STATUS
+                                                </a>
+                                            @else
+                                                <span class="badge badge-light">Selesai</span>
+                                            @endif
 
-                                        {{-- Tombol Hapus (jika diperlukan) --}}
-                                        <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $ticket->id }}">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
+                                        @else {{-- Ini untuk Admin --}}
+                                            <a href="{{ route('tickets.edit', $ticket->id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fa fa-pencil-alt"></i> LIHAT/ASSIGN
+                                            </a>
+                                        @endif
+
+                                        {{-- Tombol Hapus hanya untuk yang punya izin --}}
+                                        @can('tickets.delete')
+                                            <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $ticket->id }}">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        @endcan
                                     </td>
                                 </tr>
                                 @empty

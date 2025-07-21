@@ -47,9 +47,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('tickets/{ticket}/assign', [TicketController::class, 'assignForm'])->name('tickets.assignForm');
     Route::post('tickets/{ticket}/assign', [TicketController::class, 'assignStore'])->name('tickets.assignStore');
 
+    // Daftarkan route untuk halaman update/edit secara manual
+    Route::get('tickets/{ticket}/edit', [TicketController::class, 'updateForm'])->name('tickets.edit');
+
+    // Daftarkan sisa resource route, kecuali edit, create, dan store
     Route::resource('tickets', TicketController::class)->except([
         'create',
-        'store'
+        'store',
+        'edit'
     ]);
 
     Route::resource('permissions', PermissionController::class)->only([
