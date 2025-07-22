@@ -33,13 +33,23 @@
                         <div class="form-group">
                             <label class="font-weight-bold">PERMISSIONS</label>
                             
-                            @foreach ($permissions as $permission)
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="check-{{ $permission->id }}">
-                                <label class="form-check-label" for="check-{{ $permission->id }}">
-                                    {{ $permission->name }}
-                                </label>
-                            </div>
+                            @foreach ($permissions as $groupName => $permissionGroup)
+                                <div class="form-group">
+                                    <label class="font-weight-bold">{{ strtoupper($groupName) }}</label>
+                                    <div class="row">
+                                        @foreach ($permissionGroup as $permission)
+                                            <div class="col-md-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="{{ $permission->id }}">
+                                                    <label class="form-check-label" for="{{ $permission->id }}">
+                                                        {{ $permission->name }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <hr>
                             @endforeach
                         </div>
 

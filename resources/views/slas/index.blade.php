@@ -18,7 +18,7 @@
                     <form action="{{ route('slas.index') }}" method="GET">
                         <div class="form-group">
                             <div class="input-group mb-3">
-                                @can('slas.create')
+                                @can('manage slas')
                                     <div class="input-group-prepend">
                                         <a href="{{ route('slas.create') }}" class="btn btn-primary" style="padding-top: 10px;"><i class="fa fa-plus-circle"></i> TAMBAH</a>
                                     </div>
@@ -53,13 +53,13 @@
                                     <td>{{ $sla->resolution }}</td>
                                     <td>{{ $sla->warning }}</td>
                                     <td class="text-center">
-                                        @can('slas.edit')
+                                        @can('manage slas')
                                             <a href="{{ route('slas.edit', $sla->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="fa fa-pencil-alt"></i>
                                             </a>
                                         @endcan
 
-                                        @can('slas.delete')
+                                        @can('manage slas')
                                             <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $sla->id }}">
                                                 <i class="fa fa-trash"></i>
                                             </button>

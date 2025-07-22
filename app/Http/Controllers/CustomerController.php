@@ -14,7 +14,7 @@ class CustomerController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['permission:customers.index|customers.create|customers.edit|customers.delete']);
+        $this->middleware(['permission:manage customers']);
     }
     /**
      * Display a listing of the resource.
@@ -23,8 +23,8 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::latest()->when(request()->q, function($customers) {
-            $customers = $customers->where('name', 'like', '%'. request()->q . '%');
+        $customers = Customer::latest()->when(request()->q, function ($customers) {
+            $customers = $customers->where('name', 'like', '%' . request()->q . '%');
         })->paginate(5);
 
         return view('customers.index', compact('customers'));
@@ -48,15 +48,15 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name'     => 'required',
-            'address'   => 'required',
-            'phone'   => 'required|max:15',
-            'email'   => 'required|email',
-            'pic'   => 'required',
-            'salesperson'   => 'required',
-            'product'   => 'required',
-        ]);
+        // $this->validate($request, [
+        //     'name'     => 'required',
+        //     'address'   => 'required',
+        //     'phone'   => 'required|max:15',
+        //     'email'   => 'required|email',
+        //     'pic'   => 'required',
+        //     'salesperson'   => 'required',
+        //     'product'   => 'required',
+        // ]);
 
         $customers = Customer::create([
             'name'     => $request->name,
@@ -68,10 +68,10 @@ class CustomerController extends Controller
             'product'     => $request->product,
         ]);
 
-        if($customers){
+        if ($customers) {
             //redirect dengan pesan sukses
             return redirect()->route('customers.index')->with(['success' => 'Data Berhasil Disimpan!']);
-        }else{
+        } else {
             //redirect dengan pesan error
             return redirect()->route('customers.index')->with(['error' => 'Data Gagal Disimpan!']);
         }
@@ -109,7 +109,7 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
         $this->validate($request, [
             'name'     => 'required',
             'address'   => 'required',
@@ -132,10 +132,10 @@ class CustomerController extends Controller
             'product'     => $request->product,
         ]);
 
-        if($customer){
+        if ($customer) {
             //redirect dengan pesan sukses
             return redirect()->route('customers.index')->with(['success' => 'Data Berhasil Disimpan!']);
-        }else{
+        } else {
             //redirect dengan pesan error
             return redirect()->route('customers.index')->with(['error' => 'Data Gagal Disimpan!']);
         }
@@ -152,11 +152,11 @@ class CustomerController extends Controller
         $customer = Customer::findOrFail($id);
         $customer->delete();
 
-        if($customer){
+        if ($customer) {
             return response()->json([
                 'status' => 'success'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 'error'
             ]);

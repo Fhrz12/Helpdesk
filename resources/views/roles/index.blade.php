@@ -18,10 +18,8 @@
                     <form action="{{ route('roles.index') }}" method="GET">
                         <div class="form-group">
                             <div class="input-group mb-3">
-                                @can('roles.create')
-                                    <div class="input-group-prepend">
-                                        <a href="{{ route('roles.create') }}" class="btn btn-primary" style="padding-top: 10px;"><i class="fa fa-plus-circle"></i> TAMBAH</a>
-                                    </div>
+                                @can('manage roles')
+                                    <a href="{{ route('roles.create') }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> TAMBAH ROLE</a>
                                 @endcan
                                 <input type="text" class="form-control" name="q"
                                        placeholder="cari berdasarkan nama role">
@@ -53,16 +51,13 @@
                                         @endforeach
                                     </td>
                                     <td class="text-center">
-                                        @can('roles.edit')
+                                        @can('manage roles')
                                             <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-sm btn-primary">
-                                                <i class="fa fa-pencil-alt"></i>
+                                                <i class="fa fa-pencil-alt"></i> EDIT
                                             </a>
-                                        @endcan
-                                        
-                                        @can('roles.delete')
                                             <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $role->id }}">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
+                                                <i class="fa fa-trash"></i> HAPUS
+                                            </button>   
                                         @endcan
                                     </td>
                                 </tr>

@@ -18,7 +18,7 @@
                     <form action="{{ route('customers.index') }}" method="GET">
                         <div class="form-group">
                             <div class="input-group mb-3">
-                                @can('customers.create')
+                                @can('manage customers')
                                     <div class="input-group-prepend">
                                         <a href="{{ route('customers.create') }}" class="btn btn-primary" style="padding-top: 10px;"><i class="fa fa-plus-circle"></i> TAMBAH</a>
                                     </div>
@@ -59,13 +59,13 @@
                                     <td>{{ $customer->salesperson }}</td>
                                     <td>{{ $customer->product }}</td>
                                     <td class="text-center">
-                                        @can('customers.edit')
+                                        @can('manage customers')
                                             <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="fa fa-pencil-alt"></i>
                                             </a>
                                         @endcan
 
-                                        @can('customers.delete')
+                                        @can('manage customers')
                                             <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $customer->id }}">
                                                 <i class="fa fa-trash"></i>
                                             </button>

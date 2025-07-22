@@ -15,9 +15,9 @@ class ProjectController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['permission:projects.index|projects.create|projects.edit|projects.delete']);
+        $this->middleware(['permission:manage projects']);
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -25,8 +25,8 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::latest()->when(request()->q, function($projecs) {
-            $projecs = $projecs->where('name', 'like', '%'. request()->q . '%');
+        $projects = Project::latest()->when(request()->q, function ($projecs) {
+            $projecs = $projecs->where('name', 'like', '%' . request()->q . '%');
         })->paginate(10);
 
         $customer = new Customer();
@@ -53,7 +53,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'name' => 'required',
             'customer_id' => 'required',
             'deliverystart' => 'required',
@@ -82,17 +82,16 @@ class ProjectController extends Controller
             'billdue' => $request->billdue,
             'warrantyperiod' => $request->warrantyperiod,
             'contractstart' => $request->contractstart,
-            'contractperiod' =>$request->contractperiod,
-         ]);
+            'contractperiod' => $request->contractperiod,
+        ]);
 
-         $project->save();
+        $project->save();
 
-         if($project){
+        if ($project) {
             //redirect dengan pesan sukses
             return redirect()->route('projects.index')->with(['success' => 'Project Berhasil Dibuat']);
-            
-        }else{
-        //     //redirect dengan pesan error
+        } else {
+            //     //redirect dengan pesan error
             return redirect()->route('projects.index')->with(['error' => 'Project Gagal Dibuat']);
         }
     }
@@ -130,7 +129,7 @@ class ProjectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'name' => 'required',
             'customer_id' => 'required',
             'deliverystart' => 'required',
@@ -162,15 +161,14 @@ class ProjectController extends Controller
             'billdue' => $request->billdue,
             'warrantyperiod' => $request->warrantyperiod,
             'contractstart' => $request->contractstart,
-            'contractperiod' =>$request->contractperiod,
-         ]);
+            'contractperiod' => $request->contractperiod,
+        ]);
 
-         if($project){
+        if ($project) {
             //redirect dengan pesan sukses
             return redirect()->route('projects.index')->with(['success' => 'Project Berhasil Diubah']);
-            
-        }else{
-        //     //redirect dengan pesan error
+        } else {
+            //     //redirect dengan pesan error
             return redirect()->route('projects.index')->with(['error' => 'Project Gagal Diubah']);
         }
     }
@@ -186,11 +184,11 @@ class ProjectController extends Controller
         $project = Project::findOrFail($id);
         $project->delete();
 
-        if($project){
+        if ($project) {
             return response()->json([
                 'status' => 'success'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 'error'
             ]);

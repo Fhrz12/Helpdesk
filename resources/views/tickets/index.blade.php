@@ -76,12 +76,12 @@
 
                                         @else {{-- Ini untuk Admin --}}
                                             <a href="{{ route('tickets.edit', $ticket->id) }}" class="btn btn-sm btn-primary">
-                                                <i class="fa fa-pencil-alt"></i> LIHAT/ASSIGN
+                                                <i class="fa fa-pencil-alt"></i> ASSIGN
                                             </a>
                                         @endif
 
                                         {{-- Tombol Hapus hanya untuk yang punya izin --}}
-                                        @can('tickets.delete')
+                                        @can('delete tickets')
                                             <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $ticket->id }}">
                                                 <i class="fa fa-trash"></i>
                                             </button>

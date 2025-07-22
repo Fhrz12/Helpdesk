@@ -18,7 +18,7 @@
                     <form action="{{ route('news.index') }}" method="GET">
                         <div class="form-group">
                             <div class="input-group mb-3">
-                                @can('news.create')
+                                @can('manage news')
                                     <div class="input-group-prepend">
                                         <a href="{{ route('news.create') }}" class="btn btn-primary" style="padding-top: 10px;"><i class="fa fa-plus-circle"></i> TAMBAH</a>
                                     </div>
@@ -55,13 +55,13 @@
                                     <td>{{ $item->created_at }}</td>
                                     <td>{{ $item->updated_at }}</td>
                                     <td class="text-center">
-                                        @can('news.edit')
+                                        @can('manage news')
                                             <a href="{{ route('news.edit', $item->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="fa fa-pencil-alt"></i>
                                             </a>
                                         @endcan
 
-                                        @can('news.delete')
+                                        @can('manage news')
                                             <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $item->id }}">
                                                 <i class="fa fa-trash"></i>
                                             </button>

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\News;
 use App\Models\User;
 use App\Models\Ticket;
@@ -39,8 +40,32 @@ Route::post('/lapor', [App\Http\Controllers\PublicTicketController::class, 'stor
 Route::group(['middleware' => 'auth'], function () {
     Route::get('/dashboard', function () {
         $report = new ReportService(now()->format('Y'), now()->format('m'));
-        $allReports = $report->getAllTechnicianTickets();
         $news = News::latest()->take(3)->get();
+        $user = Auth::user(); // Ambil pengguna yang sedang login
+
+        // Cek jika pengguna adalah Teknisi
+        if ($user->hasRole('Teknisi')) {
+
+            // Jika Teknisi, buat laporan hanya untuk dirinya sendiri
+            $reportForSelf = new ReportService(now()->format('Y'), now()->format('m'), $user->id);
+
+            // Buat koleksi yang berisi satu laporan saja
+            $allReports = collect([
+                [
+                    'name'     => $user->name,
+                    'assigned' => $reportForSelf->getMonthlyTickets(),
+                    'expired'  => $reportForSelf->getOverdueTickets('red'),
+                    'warning'  => $reportForSelf->getOverdueTickets('yellow'),
+                    'pending'  => $reportForSelf->getMonthlyPendingTickets(),
+                    'done'     => $reportForSelf->getMonthlyDoneTickets()
+                ]
+            ]);
+        } else {
+            // Jika bukan Teknisi (Admin), ambil laporan semua teknisi
+            $allReports = $report->getAllTechnicianTickets();
+        }
+
+        // Kirim data yang sudah difilter ke view
         return view('dashboard', compact('report', 'allReports', 'news'));
     })->name('dashboard');
 
@@ -77,9 +102,7 @@ Route::group(['middleware' => 'auth'], function () {
         'show'
     ]);
 
-    Route::resource('slas', SlaController::class)->except([
-        'show'
-    ]);
+    Route::resource('slas', SlaController::class);
 
     Route::resource('projects', ProjectController::class)->except([
         'show'

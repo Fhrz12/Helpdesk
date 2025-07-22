@@ -15,7 +15,7 @@ class RoleController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permission:roles.index|roles.create|roles.edit|roles.delete', ['only' => ['index', 'create', 'edit', 'delete']]);
+        $this->middleware(['permission:manage roles']);
     }
 
     /**
@@ -39,7 +39,7 @@ class RoleController extends Controller
      */
     public function create()
     {
-        $permissions = Permission::latest()->get();
+        $permissions = Permission::all()->groupBy('group_name');
         return view('roles.create', compact('permissions'));
     }
 

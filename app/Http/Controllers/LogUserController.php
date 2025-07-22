@@ -8,14 +8,15 @@ use Illuminate\Http\Request;
 
 class LogUserController extends Controller
 {
-   /**
+    /**
      * __construct
      *
      * @return void
      */
     public function __construct()
     {
-        $this->middleware(['permission:log_users.index']);
+        // Gunakan nama permission baru yang sudah kita buat
+        $this->middleware(['permission:view user logs']);
     }
 
     /**
@@ -25,8 +26,8 @@ class LogUserController extends Controller
      */
     public function index()
     {
-        $logs = Log_user::latest()->when(request()->q, function($logs) {
-            $logs = $logs->where('log', 'like', '%'. request()->q . '%');
+        $logs = Log_user::latest()->when(request()->q, function ($logs) {
+            $logs = $logs->where('log', 'like', '%' . request()->q . '%');
         })->paginate(10);
 
         $user = new User;

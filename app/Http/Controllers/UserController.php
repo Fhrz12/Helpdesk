@@ -15,7 +15,7 @@ class UserController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('permission:users.index|users.create|users.edit|users.delete',['only' => ['index', 'create', 'edit', 'delete']]);
+        $this->middleware(['permission:manage users']);
     }
 
     /**
@@ -25,8 +25,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::latest()->when(request()->q, function($users) {
-            $users = $users->where('name', 'like', '%'. request()->q . '%');
+        $users = User::latest()->when(request()->q, function ($users) {
+            $users = $users->where('name', 'like', '%' . request()->q . '%');
         })->paginate(10);
 
         return view('users.index', compact('users'));
@@ -66,10 +66,10 @@ class UserController extends Controller
         //assign role
         $user->assignRole($request->input('role'));
 
-        if($user){
+        if ($user) {
             //redirect dengan pesan sukses
             return redirect()->route('users.index')->with(['success' => 'Data Berhasil Disimpan!']);
-        }else{
+        } else {
             //redirect dengan pesan error
             return redirect()->route('users.index')->with(['error' => 'Data Gagal Disimpan!']);
         }
@@ -98,12 +98,12 @@ class UserController extends Controller
     {
         $this->validate($request, [
             'name'      => 'required',
-            'email'     => 'required|email|unique:users,email,'.$user->id
+            'email'     => 'required|email|unique:users,email,' . $user->id
         ]);
 
         $user = User::findOrFail($user->id);
 
-        if($request->input('password') == "") {
+        if ($request->input('password') == "") {
             $user->update([
                 'name'      => $request->input('name'),
                 'email'     => $request->input('email')
@@ -119,10 +119,10 @@ class UserController extends Controller
         //assign role
         $user->syncRoles($request->input('role'));
 
-        if($user){
+        if ($user) {
             //redirect dengan pesan sukses
             return redirect()->route('users.index')->with(['success' => 'Data Berhasil Diupdate!']);
-        }else{
+        } else {
             //redirect dengan pesan error
             return redirect()->route('users.index')->with(['error' => 'Data Gagal Diupdate!']);
         }
@@ -140,11 +140,11 @@ class UserController extends Controller
         $user->delete();
 
 
-        if($user){
+        if ($user) {
             return response()->json([
                 'status' => 'success'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 'error'
             ]);

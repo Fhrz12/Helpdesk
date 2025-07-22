@@ -17,9 +17,9 @@ class NewsController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['permission:news.index|news.create|news.edit|news.delete']);
+        $this->middleware(['permission:manage news']);
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -27,8 +27,8 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $news = News::latest()->when(request()->q, function($news) {
-            $news = $news->where('title', 'like', '%'. request()->q . '%');
+        $news = News::latest()->when(request()->q, function ($news) {
+            $news = $news->where('title', 'like', '%' . request()->q . '%');
         })->paginate(10);
 
         $user = new User;
@@ -66,10 +66,10 @@ class NewsController extends Controller
             'created_at' => now()
         ]);
 
-        if($news){
+        if ($news) {
             //redirect dengan pesan sukses
             return redirect()->route('news.index')->with(['success' => 'Data Berhasil Disimpan!']);
-        }else{
+        } else {
             //redirect dengan pesan error
             return redirect()->route('news.index')->with(['error' => 'Data Gagal Disimpan!']);
         }
@@ -120,10 +120,10 @@ class NewsController extends Controller
             'updated_at' => now()
         ]);
 
-        if($news){
+        if ($news) {
             //redirect dengan pesan sukses
             return redirect()->route('news.index')->with(['success' => 'Data Berhasil Diubah!']);
-        }else{
+        } else {
             //redirect dengan pesan error
             return redirect()->route('news.index')->with(['error' => 'Data Gagal Diubah!']);
         }
@@ -140,11 +140,11 @@ class NewsController extends Controller
         $news = News::findOrFail($id);
         $news->delete();
 
-        if($news){
+        if ($news) {
             return response()->json([
                 'status' => 'success'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 'error'
             ]);

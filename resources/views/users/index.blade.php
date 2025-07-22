@@ -18,13 +18,11 @@
                     <form action="{{ route('users.index') }}" method="GET">
                         <div class="form-group">
                             <div class="input-group mb-3">
-                                @can('users.create')
-                                    <div class="input-group-prepend">
-                                        <a href="{{ route('users.create') }}" class="btn btn-primary" style="padding-top: 10px;"><i class="fa fa-plus-circle"></i> TAMBAH</a>
-                                    </div>
+                                @can('manage users')
+                                    <a href="{{ route('users.create') }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> TAMBAH USER</a>
                                 @endcan
                                 <input type="text" class="form-control" name="q"
-                                       placeholder="cari berdasarkan nama user">
+                                       placeholder="cari berdasarkan snama user">
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> CARI
                                     </button>
@@ -55,13 +53,13 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        @can('users.edit')
+                                        @can('manage users')
                                             <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="fa fa-pencil-alt"></i>
                                             </a>
                                         @endcan
                                         
-                                        @can('users.delete')
+                                        @can('manage users')
                                             <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $user->id }}">
                                                 <i class="fa fa-trash"></i>
                                             </button>

@@ -64,7 +64,7 @@
             <div class="main-sidebar sidebar-style-2">
                 <aside id="sidebar-wrapper">
                     <div class="sidebar-brand">
-                        <a href="{{ route('dashboard') }}">HELPDESK SYSTEM</a>
+                        <a href="{{ route('dashboard') }}">PANGGIL IT</a>
                     </div>
                     <div class="sidebar-brand sidebar-brand-sm">
                         <a href="index.html">HLD</a>
@@ -77,7 +77,9 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
-                        @can('tickets.index')
+
+                        {{-- Menggunakan permission baru 'view tickets' --}}
+                        @can('view tickets')
                         <li class="{{ setActive('/tickets') }}">
                             <a class="nav-link" href="{{ route('tickets.index') }}">
                                 <i class="fas fa-ticket-alt"></i>
@@ -86,7 +88,12 @@
                         </li>
                         @endcan
 
-                        @can('news.index')
+                        {{-- Cek jika user punya salah satu izin di grup Content --}}
+                        @if(auth()->user()->can('manage news') || auth()->user()->can('manage projects') || auth()->user()->can('manage customers') || auth()->user()->can('manage slas'))
+                        <li class="menu-header">CONTENT MANAGEMENT</li>
+                        @endif
+
+                        @can('manage news')
                         <li class="{{ setActive('/news') }}">
                             <a class="nav-link" href="{{ route('news.index') }}">
                                 <i class="fas fa-newspaper"></i>
@@ -95,7 +102,7 @@
                         </li>
                         @endcan
 
-                        @can('projects.index')
+                        @can('manage projects')
                         <li class="{{ setActive('/projects') }}">
                             <a class="nav-link" href="{{ route('projects.index') }}">
                                 <i class="fas fa-project-diagram"></i>
@@ -104,7 +111,7 @@
                         </li>
                         @endcan
 
-                        @can('customers.index')
+                        @can('manage customers')
                         <li class="{{ setActive('/customers') }}">
                             <a class="nav-link" href="{{ route('customers.index') }}">
                                 <i class="fas fa-user-tie"></i>
@@ -113,7 +120,7 @@
                         </li>
                         @endcan
 
-                        @can('slas.index')
+                        @can('manage slas')
                         <li class="{{ setActive('/slas') }}">
                             <a class="nav-link" href="{{ route('slas.index') }}">
                                 <i class="fas fa-file-medical-alt"></i>
@@ -122,16 +129,12 @@
                         </li>
                         @endcan
 
-                        @can('permissions.index')
-                        <li class="menu-header">SETTING</li>
-                        <li class="{{ setActive('/permissions') }}">
-                            <a class="nav-link" href="{{route('permissions.index') }}">
-                                <i class="fas fa-unlock-alt"></i>
-                                <span>Permissions</span>
-                            </a>
-                        </li>
-                        @endcan
-                        @can('roles.index')
+                        {{-- Cek jika user punya salah satu izin di grup User Management --}}
+                        @if(auth()->user()->can('manage roles') || auth()->user()->can('manage users'))
+                        <li class="menu-header">USER MANAGEMENT</li>
+                        @endif
+                        
+                        @can('manage roles')
                         <li class="{{ setActive('/roles') }}">
                             <a class="nav-link" href="{{ route('roles.index') }}">
                                 <i class="fas fa-unlock"> </i>
@@ -139,22 +142,24 @@
                             </a>
                         </li>
                         @endcan
-                        @can('users.index')
-                        <li class="{{ setActive('/user') }}">
+
+                        @can('manage users')
+                        <li class="{{ setActive('/users') }}">
                             <a class="nav-link" href="{{ route('users.index') }}">
                                 <i class="fas fa-users"></i>
                                 <span>Users</span>
                             </a>
                         </li>
                         @endcan
-                        @can('log_users.index')
-                        <li class="{{ setActive('/user-log') }}">
-                            <a class="nav-link" href="{{ route('userlog.index') }}">
-                                <i class="fas fa-list"></i>
-                                <span>User Logs</span>
-                            </a>
-                        </li>
-                        @endcan
+
+                        @can('view user logs')
+                            <li class="{{ setActive('/user-log') }}">
+                                <a class="nav-link" href="{{ route('userlog.index') }}">
+                                    <i class="fas fa-list"></i>
+                                    <span>User Logs</span>
+                                </a>
+                            </li>
+                            @endcan
                     </ul>
                 </aside>
             </div>

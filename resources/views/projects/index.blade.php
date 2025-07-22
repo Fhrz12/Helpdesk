@@ -18,7 +18,7 @@
                     <form action="{{ route('projects.index') }}" method="GET">
                         <div class="form-group">
                             <div class="input-group mb-3">
-                                @can('projects.create')
+                                @can('manage projects')
                                     <div class="input-group-prepend">
                                         <a href="{{ route('projects.create') }}" class="btn btn-primary" style="padding-top: 10px;"><i class="fa fa-plus-circle"></i> TAMBAH</a>
                                     </div>
@@ -71,13 +71,13 @@
                                     <td>{{ Carbon\Carbon::parse($project->contractstart)->format('d M Y') }}</td>
                                     <td>{{ $project->contractperiod }}</td>
                                     <td class="text-center">
-                                        @can('projects.edit')
+                                        @can('manage projects')
                                             <a href="{{ route('projects.edit', $project->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="fa fa-pencil-alt"></i>
                                             </a>
                                         @endcan
 
-                                        @can('projects.delete')
+                                        @can('manage projects')
                                             <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $project->id }}">
                                                 <i class="fa fa-trash"></i>
                                             </button>

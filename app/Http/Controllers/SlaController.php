@@ -9,7 +9,7 @@ class SlaController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['permission:slas.index|slas.create|slas.edit|slas.delete']);
+        $this->middleware(['permission:manage slas']);
     }
     /**
      * Display a listing of the resource.
@@ -18,8 +18,8 @@ class SlaController extends Controller
      */
     public function index()
     {
-        $slas = Sla::orderBy('name')->when(request()->q, function($slas) {
-            $slas = $slas->where('name', 'like', '%'. request()->q . '%');
+        $slas = Sla::orderBy('name')->when(request()->q, function ($slas) {
+            $slas = $slas->where('name', 'like', '%' . request()->q . '%');
         })->paginate(10);
 
         return view('slas.index', compact('slas'));
@@ -57,10 +57,10 @@ class SlaController extends Controller
             'warning'   => $request->warning,
         ]);
 
-        if($slas){
+        if ($slas) {
             //redirect dengan pesan sukses
             return redirect()->route('slas.index')->with(['success' => 'Data Berhasil Disimpan!']);
-        }else{
+        } else {
             //redirect dengan pesan error
             return redirect()->route('slas.index')->with(['error' => 'Data Gagal Disimpan!']);
         }
@@ -105,7 +105,7 @@ class SlaController extends Controller
             'resolution'   => 'required|numeric',
             'warning'   => 'required|numeric',
         ]);
-        
+
         $sla = Sla::findOrFail($id);
         $sla->update([
             'name'     => $request->name,
@@ -114,10 +114,10 @@ class SlaController extends Controller
             'warning'   => $request->warning,
         ]);
 
-        if($sla){
+        if ($sla) {
             //redirect dengan pesan sukses
             return redirect()->route('slas.index')->with(['success' => 'Data Berhasil Disimpan!']);
-        }else{
+        } else {
             //redirect dengan pesan error
             return redirect()->route('slas.index')->with(['error' => 'Data Gagal Disimpan!']);
         }
@@ -134,11 +134,11 @@ class SlaController extends Controller
         $sla = Sla::findOrFail($id);
         $sla->delete();
 
-        if($sla){
+        if ($sla) {
             return response()->json([
                 'status' => 'success'
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => 'error'
             ]);

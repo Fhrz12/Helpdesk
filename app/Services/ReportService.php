@@ -20,46 +20,30 @@ class ReportService
         $this->id = $id;
     }
 
+    // Tambahkan method privat ini
+    private function getBaseMonthlyQuery()
+    {
+        return Ticket::whereYear('reporteddate', $this->year)
+            ->whereMonth('reporteddate', $this->month)
+            ->when(!is_null($this->id), function ($query) {
+                $query->where('assignee', $this->id);
+            });
+    }
+
+    // Kemudian, sederhanakan method lainnya
     public function getMonthlyTickets()
     {
-        $monthlyTickets = Ticket::whereYear('reporteddate', $this->year)
-            ->whereMonth('reporteddate', $this->month)
-            ->when(!is_null($this->id), function ($monthlyTickets) {
-                $monthlyTickets = $monthlyTickets->whereYear('reporteddate', $this->year)
-                    ->whereMonth('reporteddate', $this->month)
-                    ->where('assignee', $this->id);
-            })->count();
-        return $monthlyTickets;
+        return $this->getBaseMonthlyQuery()->count();
     }
 
     public function getMonthlyDoneTickets()
     {
-        $monthlyDoneTickets = Ticket::whereYear('reporteddate', $this->year)
-            ->whereMonth('reporteddate', $this->month)
-            ->Where('status', 'Closed')
-            ->when(!is_null($this->id), function ($monthlyDoneTickets) {
-                $monthlyDoneTickets = $monthlyDoneTickets
-                    ->whereYear('reporteddate', $this->year)
-                    ->whereMonth('reporteddate', $this->month)
-                    ->Where('status', 'Closed')
-                    ->where('assignee', $this->id);
-            })->count();
-        return $monthlyDoneTickets;
+        return $this->getBaseMonthlyQuery()->where('status', Ticket::STATUS_CLOSED)->count();
     }
 
     public function getMonthlyPendingTickets()
     {
-        $monthlyPendingTickets = Ticket::whereYear('reporteddate', $this->year)
-            ->whereMonth('reporteddate', $this->month)
-            ->Where('status', 'Pending')
-            ->when(!is_null($this->id), function ($monthlyPendingTickets) {
-                $monthlyPendingTickets = $monthlyPendingTickets
-                    ->whereYear('reporteddate', $this->year)
-                    ->whereMonth('reporteddate', $this->month)
-                    ->Where('status', 'Pending')
-                    ->where('assignee', $this->id);
-            })->count();
-        return $monthlyPendingTickets;
+        return $this->getBaseMonthlyQuery()->where('status', 'Pending')->count(); // <-- Gunakan konstanta di sini jika ada
     }
 
     public function getOverdueTickets(String $code = null)

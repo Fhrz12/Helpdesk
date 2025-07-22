@@ -23,7 +23,10 @@ class TicketController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['permission:tickets.index|tickets.create|tickets.edit|tickets.delete']);
+        $this->middleware('permission:view tickets', ['only' => ['index', 'updateForm']]);
+        $this->middleware('permission:assign tickets', ['only' => ['assignForm', 'assignStore']]);
+        $this->middleware('permission:update tickets', ['only' => ['update']]);
+        $this->middleware('permission:delete tickets', ['only' => ['destroy']]);
     }
 
     /**
@@ -31,27 +34,25 @@ class TicketController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
         $user = Auth::user();
 
-        // Cek jika pengguna memiliki peran 'Teknisi'
+        // Siapkan query dasar dengan Eager Loading
+        $ticketsQuery = Ticket::with(['customer', 'technician', 'sla']);
+
         if ($user->hasRole('Teknisi')) {
-            // Jika Teknisi, hanya tampilkan tiket yang di-assign kepadanya
-            $tickets = Ticket::where('assignee', $user->id)
-                ->latest()
-                ->when(request()->q, function ($query) {
-                    $query->where('problemsummary', 'like', '%' . request()->q . '%');
-                })
-                ->paginate(10);
-        } else {
-            // Jika bukan Teknisi (misal: Admin), tampilkan semua tiket
-            $tickets = Ticket::latest()
-                ->when(request()->q, function ($query) {
-                    $query->where('problemsummary', 'like', '%' . request()->q . '%');
-                })
-                ->paginate(10);
+            // Filter untuk teknisi
+            $ticketsQuery->where('assignee', $user->id);
         }
+
+        // Terapkan pencarian dan paginasi
+        $tickets = $ticketsQuery->latest()
+            ->when(request()->q, function ($query) {
+                $query->where('problemsummary', 'like', '%' . request()->q . '%');
+            })
+            ->paginate(10);
 
         return view('tickets.index', compact('tickets'));
     }
